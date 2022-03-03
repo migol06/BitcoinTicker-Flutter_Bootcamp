@@ -11,12 +11,12 @@ class PriceScreen extends StatefulWidget {
 
 class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency = 'USD';
-  String? rate;
+  Map<String, String> coinRates = {};
 
   Future<void> getData() async {
     var currencyRate = await CoinData().getAPI(selectedCurrency);
     setState(() {
-      rate = currencyRate;
+      coinRates = currencyRate;
     });
   }
 
@@ -65,6 +65,19 @@ class _PriceScreenState extends State<PriceScreen> {
     super.initState();
   }
 
+  List<Widget> getCrypto() {
+    List<Widget> listCards = [];
+    for (String crypto in cryptoList) {
+      Widget card = CardWidget(
+        rate: coinRates[crypto],
+        selectedCurrency: selectedCurrency,
+        cryptoCurrency: crypto,
+      );
+      listCards.add(card);
+    }
+    return listCards;
+  }
+
   @override
   Widget build(BuildContext context) {
     bool isIOS = Theme.of(context).platform == TargetPlatform.iOS;
@@ -78,24 +91,8 @@ class _PriceScreenState extends State<PriceScreen> {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
-            child: Card(
-              color: Colors.lightBlueAccent,
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 15.0, horizontal: 28.0),
-                child: Text(
-                  '1 BTC = $rate $selectedCurrency',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
+            child: Column(
+              children: getCrypto(),
             ),
           ),
           Container(
@@ -106,6 +103,41 @@ class _PriceScreenState extends State<PriceScreen> {
             child: isIOS ? cupertinoPicker() : dropDownAndroid(),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class CardWidget extends StatelessWidget {
+  const CardWidget({
+    Key? key,
+    required this.rate,
+    required this.selectedCurrency,
+    this.cryptoCurrency,
+  }) : super(key: key);
+
+  final String? rate;
+  final String selectedCurrency;
+  final String? cryptoCurrency;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: Colors.lightBlueAccent,
+      elevation: 5.0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+        child: Text(
+          '1 $cryptoCurrency = $rate $selectedCurrency',
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 20.0,
+            color: Colors.white,
+          ),
+        ),
       ),
     );
   }

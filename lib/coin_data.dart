@@ -37,14 +37,19 @@ const List<String> cryptoList = [
 
 class CoinData {
   Future getAPI(String currency) async {
-    http.Response response =
-        await http.get(Uri.parse('$_baseURL/BTC/$currency?apikey=$_apiKey'));
-    if (response.statusCode == 200) {
-      double getRate = jsonDecode(response.body)['rate'];
-      debugPrint(getRate.toStringAsFixed(2));
-      return getRate.toStringAsFixed(2);
-    } else {
-      debugPrint(response.statusCode.toString());
+    Map<String, String> cryptoRates = {};
+    for (String crypto in cryptoList) {
+      http.Response response = await http
+          .get(Uri.parse('$_baseURL/$crypto/$currency?apikey=$_apiKey'));
+      if (response.statusCode == 200) {
+        double getRate = jsonDecode(response.body)['rate'];
+        debugPrint(getRate.toStringAsFixed(2));
+        cryptoRates[crypto] = getRate.toStringAsFixed(2);
+      } else {
+        debugPrint(response.statusCode.toString());
+      }
     }
+
+    return cryptoRates;
   }
 }
