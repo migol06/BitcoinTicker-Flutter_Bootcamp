@@ -1,7 +1,6 @@
 import 'package:bitcoin_ticker/coin_data.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:http/retry.dart';
 
 class PriceScreen extends StatefulWidget {
   const PriceScreen({Key? key}) : super(key: key);
@@ -15,8 +14,7 @@ class _PriceScreenState extends State<PriceScreen> {
   String? rate;
 
   Future<void> getData() async {
-    // CoinData coinData = CoinData();
-    var currencyRate = await CoinData().getAPI();
+    var currencyRate = await CoinData().getAPI(selectedCurrency);
     setState(() {
       rate = currencyRate;
     });
@@ -31,7 +29,12 @@ class _PriceScreenState extends State<PriceScreen> {
     return CupertinoPicker(
         backgroundColor: Colors.lightBlue,
         itemExtent: 20.0,
-        onSelectedItemChanged: (value) {},
+        onSelectedItemChanged: (value) {
+          setState(() {
+            selectedCurrency = currenciesList[value];
+          });
+          getData();
+        },
         children: cupertinoPicker);
   }
 
@@ -51,6 +54,7 @@ class _PriceScreenState extends State<PriceScreen> {
         onChanged: (_value) {
           setState(() {
             selectedCurrency = _value!;
+            getData();
           });
         });
   }
@@ -84,7 +88,7 @@ class _PriceScreenState extends State<PriceScreen> {
                 padding: const EdgeInsets.symmetric(
                     vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 BTC = $rate USD',
+                  '1 BTC = $rate $selectedCurrency',
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 20.0,

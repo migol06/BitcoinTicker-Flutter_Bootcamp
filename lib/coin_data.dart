@@ -36,9 +36,9 @@ const List<String> cryptoList = [
 ];
 
 class CoinData {
-  Future getAPI() async {
+  Future getAPI(String currency) async {
     http.Response response =
-        await http.get(Uri.parse('$_baseURL/BTC/USD?apikey=$_apiKey'));
+        await http.get(Uri.parse('$_baseURL/BTC/$currency?apikey=$_apiKey'));
     if (response.statusCode == 200) {
       double getRate = jsonDecode(response.body)['rate'];
       debugPrint(getRate.toStringAsFixed(2));
