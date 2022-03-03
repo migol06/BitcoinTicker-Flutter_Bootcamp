@@ -1,5 +1,5 @@
 import 'package:bitcoin_ticker/coin_data.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class PriceScreen extends StatefulWidget {
@@ -12,7 +12,20 @@ class PriceScreen extends StatefulWidget {
 class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency = 'USD';
 
-  List<DropdownMenuItem<String>> getDropDownItems() {
+  CupertinoPicker cupertinoPicker() {
+    List<Text> cupertinoPicker = [];
+    for (String currency in currenciesList) {
+      var text = Text(currency);
+      cupertinoPicker.add(text);
+    }
+    return CupertinoPicker(
+        backgroundColor: Colors.lightBlue,
+        itemExtent: 20.0,
+        onSelectedItemChanged: (value) {},
+        children: cupertinoPicker);
+  }
+
+  DropdownButton<String> dropDownAndroid() {
     List<DropdownMenuItem<String>> dropdownItems = [];
     for (String currency in currenciesList) {
       var items = DropdownMenuItem(
@@ -22,11 +35,19 @@ class _PriceScreenState extends State<PriceScreen> {
       dropdownItems.add(items);
     }
 
-    return dropdownItems;
+    return DropdownButton<String>(
+        value: selectedCurrency,
+        items: dropdownItems,
+        onChanged: (_value) {
+          setState(() {
+            selectedCurrency = _value!;
+          });
+        });
   }
 
   @override
   Widget build(BuildContext context) {
+    bool isIOS = Theme.of(context).platform == TargetPlatform.iOS;
     return Scaffold(
       appBar: AppBar(
         title: const Text('🤑 Coin Ticker'),
@@ -61,14 +82,7 @@ class _PriceScreenState extends State<PriceScreen> {
             alignment: Alignment.center,
             padding: const EdgeInsets.only(bottom: 30.0),
             color: Colors.lightBlue,
-            child: DropdownButton<String>(
-                value: selectedCurrency,
-                items: getDropDownItems(),
-                onChanged: (_value) {
-                  setState(() {
-                    selectedCurrency = _value!;
-                  });
-                }),
+            child: isIOS ? cupertinoPicker() : dropDownAndroid(),
           ),
         ],
       ),
